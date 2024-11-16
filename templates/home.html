@@ -1,0 +1,38 @@
+{% extends 'dummy.html' %}
+{% load static %}
+{% block title %}
+    <title>Home Page</title>
+    <link rel="stylesheet" href="{% static 'css/styling.css' %}">
+{% endblock %}
+
+{% block body_block %}
+    {% if username %}
+        <section class="container-fluid newmargin">
+            <div class="row">
+                <div class="col-6 m-auto">
+                    <div class="card new-margin">
+                        <div class="card-header">
+                            <h2 class="h2">Welcome to home page {{username}}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    {% else %}
+        <section class="container-fluid newmargin">
+            <div class="row">
+                <div class="col-6 m-auto">
+                    <div class="card new-margin">
+                        <div class="card-header">
+                            <h2 class="h2">Welcome to home page</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    {% endif %}
+
+    
+{% endblock %}
