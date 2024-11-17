@@ -17,22 +17,11 @@
                         <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
 
-                            <label for="user">Username</label>
-                            <input type="text" name="user" id="user" class="text-center form-control">
-
-
-                            <label for="email">Email</label>
-                            <input type="email" name="email" id="email" class="text-center form-control">
-
-
-                            <label for="pwd">Password</label>
-                            <input type="password" name="pwd" id="pwd" class="text-center form-control">
-                            
-                            <label for="rpwd">Re-enter Password</label>
-                            <input type="password" name="rpwd" id="rpwd" class=" text-center form-control">
+                            <label for="otp">Enter OTP</label>
+                            <input type="password" name="otp" id="otp" class="text-center form-control">
                             
                             
-                            <input type="submit" class="button-color" value="Change_password">
+                            <input type="submit" class="button-color" value="valid OTP">
 
                             
                             

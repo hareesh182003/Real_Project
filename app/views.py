@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from app.forms import *
 from app.models import *
 from django.http import HttpResponse,HttpResponseRedirect
@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.contrib.auth import authenticate,login,logout
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+import random
 # Create your views here.
 
 
@@ -67,6 +68,8 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return  HttpResponseRedirect(reverse('home'))
+
+
 @login_required
 def profile_page(request):
     username = request.session.get('username')
@@ -74,6 +77,8 @@ def profile_page(request):
     PO = Profile.objects.get(username=UO)
     d = {'UO':UO,'PO':PO}
     return render(request,'profile_page.html',d)
+
+
 @login_required
 def change_password(request):
     if request.method == 'POST':
@@ -89,20 +94,63 @@ def change_password(request):
             return HttpResponse('The password not matched')
     return render(request,'change_password.html')
 
+def otpgenerator():
+    return random.randint(100000,999999)
+
+def otp_page(request):
+    if request.method == 'POST':
+        otp = request.session.get('otp')
+        entered_otp = request.POST['otp']
+        if entered_otp and int(entered_otp) == otp:
+            return redirect('reset_continuation')
+        else:
+            return HttpResponse('Invalid OTP')
+    return render(request,'otp_page.html')
+
+
 def reset_password(request):
     if request.method == 'POST':
         user = request.POST['user']
         pwd = request.POST['pwd']
         rpwd = request.POST['rpwd']
+        email = request.POST['email']
 
         if pwd == rpwd:
             UO = User.objects.filter(username=user)
             if UO:
-                UO[0].set_password(pwd)
-                UO[0].save()
-                return render(request,'user_login.html')
+                if UO[0].email == email:
+                    otp = otpgenerator()
+                    request.session['otp'] = otp
+                    request.session['username'] = user
+                    request.session['password'] = pwd
+                    
+                    send_mail(
+                        'Reset OTP',
+                        f'{otp} is need to be typed for reset your password ',
+                        'hareeshgarisha@gmail.com',
+                        [email],
+                        fail_silently=False
+                    )
+
+                    return redirect('otp_page')
+                else:
+                    return HttpResponse('Email not matched')
             else:
                 return HttpResponse('Not a valid user')
         else:
             return HttpResponse('The password not matched')
     return render(request,'reset_password.html')
+
+
+
+
+def reset_continuation(request):
+    username = request.session.get('username')
+    password = request.session.get('password')
+    UO = User.objects.filter(username = username)
+    if UO:
+        UO[0].set_password(password)
+        UO[0].save()
+        return HttpResponse('Reset is done after the validation')
+    else:
+        return HttpResponse('user is not valid')
